@@ -11,7 +11,8 @@
   "jest": {
     "testEnvironment": "node",
     "collectCoverage": true,
-    "coverageDirectory": "coverage"
+    "coverageDirectory": "coverage",
+    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
   },
   "dependencies": {
     "express": "^4.18.2",
