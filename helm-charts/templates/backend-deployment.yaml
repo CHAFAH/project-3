@@ -37,19 +37,16 @@ spec:
             secretKeyRef:
               name: application-secrets
               key: NODE_ENV
-              namespace: external-secrets
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
               name: application-secrets
               key: JWT_SECRET
-              namespace: external-secrets
         - name: API_KEY
           valueFrom:
             secretKeyRef:
               name: application-secrets
               key: API_KEY
-              namespace: external-secrets
         - name: DATABASE_URL
           value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@{{ .Values.database.name }}:{{ .Values.database.service.port }}/$(POSTGRES_DB)"
         - name: POSTGRES_USER
@@ -57,19 +54,16 @@ spec:
             secretKeyRef:
               name: database-secrets
               key: POSTGRES_USER
-              namespace: external-secrets
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: database-secrets
               key: POSTGRES_PASSWORD
-              namespace: external-secrets
         - name: POSTGRES_DB
           valueFrom:
             secretKeyRef:
               name: database-secrets
               key: POSTGRES_DB
-              namespace: external-secrets
         - name: POSTGRES_HOST
           value: {{ .Values.database.name | quote }}
         livenessProbe:

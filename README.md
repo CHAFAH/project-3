@@ -216,14 +216,17 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
 
-# Install External Secrets Operator
+# Uninstall existing installation if needed
+helm uninstall external-secrets -n external-secrets
+
+# Install External Secrets Operator with CRDs
 helm install external-secrets external-secrets/external-secrets \
   -n external-secrets \
   --create-namespace \
   --set installCRDs=true
 
 # Verify installation
-kubectl get pods -n external-secrets-system
+kubectl get pods -n external-secrets
 kubectl get crd | grep external-secrets
 ```
 
@@ -287,11 +290,9 @@ helm upgrade --install nebulance-app helm-charts/ \
 
 ```bash
 # Template and validate Helm charts first
-cd helm-charts/
-helm template nebulance-app . --validate
+helm template nebulance-app helm-charts/ --validate
 
 # Install the application stack
-cd ..
 helm install nebulance-app helm-charts/ \
   --namespace nebulance-app \
   --create-namespace \

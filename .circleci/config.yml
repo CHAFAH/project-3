@@ -88,18 +88,11 @@ jobs:
             sed -i "s|tag: \"frontend-1.0.0\"|tag: \"frontend-$TIMESTAMP\"|g" helm-charts/values.yaml
             sed -i "s|tag: \"backend-1.0.0\"|tag: \"backend-$TIMESTAMP\"|g" helm-charts/values.yaml
             
-            # Template and validate Helm charts
-            helm template nebulance-app helm-charts/ --validate
-            
-            # Use the correct namespace
-            NAMESPACE="nebulance-app"
-            
-            # Create namespace if it doesn't exist
-            kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-            
             # Deploy with Helm
             helm upgrade --install nebulance-app helm-charts/ \
-              --namespace $NAMESPACE \
+              --namespace nebulance-app \
+              --create-namespace \
+              --set secrets.enabled=false \
               --timeout 10m
 
 workflows:
