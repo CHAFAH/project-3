@@ -91,8 +91,6 @@ jobs:
             # Deploy with Helm
             helm upgrade --install nebulance-app helm-charts/ \
               --namespace nebulance-app \
-              --create-namespace \
-              --set secrets.enabled=false \
               --timeout 10m
 
 workflows:
