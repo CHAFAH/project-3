@@ -1,6 +1,12 @@
 const request = require('supertest');
 const app = require('./server');
 
+afterAll(() => {
+  if (app.server) {
+    app.server.close();
+  }
+});
+
 describe('API Endpoints', () => {
   describe('GET /health', () => {
     it('should return health status', async () => {

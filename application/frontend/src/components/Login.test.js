@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
 import Login from './Login';
 
@@ -10,7 +11,7 @@ const MockedLogin = ({ onLogin }) => (
 
 test('renders login form', () => {
   render(<MockedLogin onLogin={() => {}} />);
-  expect(screen.getByText(/Login/i)).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Login/i })).toBeInTheDocument();
   expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
   expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
 });
