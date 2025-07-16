@@ -16,8 +16,8 @@ frontend:
   name: frontend
   replicas: 2
   image:
-    repository: hilltopconsultancy/neb-frontend
-    tag: "frontend-v1"
+    repository: hilltopconsultancy/nebulance-app
+    tag: "frontend-main-20250716-277a1cc"
     pullPolicy: IfNotPresent
   
   service:
@@ -44,8 +44,8 @@ backend:
   name: backend
   replicas: 3
   image:
-    repository: hilltopconsultancy/neb-backend
-    tag: "backend-v1"
+    repository: hilltopconsultancy/nebulance-app
+    tag: "backend-main-20250716-277a1cc"
     pullPolicy: IfNotPresent
   
   service:
