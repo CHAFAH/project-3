@@ -54,9 +54,10 @@ spec:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           runAsNonRoot: true
-          runAsUser: 101  # nginx user
+          runAsUser: 101
+          runAsGroup: 101
           capabilities:
             drop:
             - ALL

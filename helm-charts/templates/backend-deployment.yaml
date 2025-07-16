@@ -47,8 +47,6 @@ spec:
             secretKeyRef:
               name: application-secrets
               key: API_KEY
-        - name: DATABASE_URL
-          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@{{ .Values.database.name }}:{{ .Values.database.service.port }}/$(POSTGRES_DB)"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -90,6 +88,8 @@ spec:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: true
           runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
           capabilities:
             drop:
             - ALL

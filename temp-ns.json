@@ -1,0 +1,22 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "creationTimestamp": "2025-07-16T03:12:56Z",
+        "labels": {
+            "kubernetes.io/metadata.name": "nebulance-app",
+            "name": "nebulance-app"
+        },
+        "name": "nebulance-app",
+        "resourceVersion": "96400",
+        "uid": "ba9a0e72-8cc9-4779-9042-8e40021f589d"
+    },
+    "spec": {
+        "finalizers": [
+            
+        ]
+    },
+    "status": {
+        "phase": "Active"
+    }
+}

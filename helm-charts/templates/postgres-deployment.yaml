@@ -21,8 +21,6 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: database
     spec:
-      securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
       containers:
       - name: postgres
         image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
@@ -52,24 +50,20 @@ spec:
         livenessProbe:
           exec:
             command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -d
-            - $(POSTGRES_DB)
-          initialDelaySeconds: 30
+              - sh
+              - -c
+              - pg_isready -U $POSTGRES_USER
+          initialDelaySeconds: 20
           periodSeconds: 10
           timeoutSeconds: 5
-          failureThreshold: 3
+          failureThreshold: 5
         readinessProbe:
           exec:
             command:
-            - pg_isready
-            - -U
-            - $(POSTGRES_USER)
-            - -d
-            - $(POSTGRES_DB)
-          initialDelaySeconds: 5
+              - sh
+              - -c
+              - pg_isready -U $POSTGRES_USER
+          initialDelaySeconds: 10
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
@@ -85,6 +79,7 @@ spec:
           readOnlyRootFilesystem: false
           runAsNonRoot: true
           runAsUser: 999
+          runAsGroup: 999
           capabilities:
             drop:
             - ALL

@@ -17,7 +17,7 @@ frontend:
   replicas: 2
   image:
     repository: hilltopconsultancy/nebulance-app
-    tag: "frontend-main-20250716-277a1cc"
+    tag: "frontend-fix"
     pullPolicy: IfNotPresent
   
   service:
@@ -45,7 +45,7 @@ backend:
   replicas: 3
   image:
     repository: hilltopconsultancy/nebulance-app
-    tag: "backend-main-20250716-277a1cc"
+    tag: "backend-fix"
     pullPolicy: IfNotPresent
   
   service:
@@ -70,6 +70,8 @@ backend:
   env:
     NODE_ENV: production
     PORT: "3000"
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: "5432"
 
 # Database configuration
 database:
@@ -106,18 +108,18 @@ secrets:
   secretStore:
     name: aws-secrets-store
     serviceAccountName: external-secrets-sa
-  
-  # Database secrets
+
   database:
-    secretName: eks-app/database
+    secretName: database-secrets
+    secretPath: "eks-app/database"
     keys:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-  
-  # Application secrets
+
   application:
-    secretName: eks-app/application
+    secretName: application-secrets
+    secretPath: "eks-app/application"
     keys:
       - JWT_SECRET
       - API_KEY
@@ -146,10 +148,9 @@ monitoring:
     interval: 30s
     scrapeTimeout: 10s
 
-# Security context
+# Security context (applied per service as needed)
 securityContext:
   runAsNonRoot: true
-  runAsUser: 1000
   fsGroup: 2000
 
 # Node selection
