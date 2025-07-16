@@ -101,7 +101,7 @@ database:
 
 # AWS Secrets Manager integration
 secrets:
-  enabled: false
+  enabled: true
   region: eu-central-1
   secretStore:
     name: aws-secrets-store
