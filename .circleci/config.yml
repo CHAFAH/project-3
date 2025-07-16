@@ -98,13 +98,15 @@ jobs:
             sed -i "s|tag: \"frontend-v1\"|tag: \"frontend-$IMAGE_TAG\"|g" helm-charts/values.yaml
             sed -i "s|tag: \"backend-v1\"|tag: \"backend-$IMAGE_TAG\"|g" helm-charts/values.yaml
             
-            # Commit updated values.yaml back to repo
-            git config user.email "forchu.cha@gmail.com"
-            git config user.name "CircleCI"
-            git remote set-url origin https://$GITHUB_TOKEN@github.com/CHAFAH/project-3.git
-            git add helm-charts/values.yaml
-            git commit -m "Update image tags to $IMAGE_TAG [skip ci]"
-            git push origin $CIRCLE_BRANCH
+            # Commit updated values.yaml back to repo if changes exist
+            if ! git diff --quiet helm-charts/values.yaml; then
+              git config user.email "forchu.cha@gmail.com"
+              git config user.name "CircleCI"
+              git remote set-url origin https://$GITHUB_TOKEN@github.com/CHAFAH/project-3.git
+              git add helm-charts/values.yaml
+              git commit -m "Update image tags to $IMAGE_TAG [skip ci]"
+              git push origin $CIRCLE_BRANCH
+            fi
             
             # Deploy with Helm
             helm upgrade --install nebulance-app helm-charts/ \
