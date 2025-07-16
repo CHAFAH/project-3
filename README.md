@@ -174,6 +174,24 @@ aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
   --policy-document file://iam_policy.json
 
+# If policy already exists, update it with missing permissions
+aws iam put-role-policy \
+  --role-name AmazonEKSLoadBalancerController \
+  --policy-name AdditionalELBPermissions \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "elasticloadbalancing:DescribeListenerAttributes",
+          "elasticloadbalancing:ModifyListenerAttributes"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }'
+
 # Create IAM role and service account
 # Replace ACCOUNT_ID with your actual AWS account ID (531807594086)
 REGION="eu-central-1"

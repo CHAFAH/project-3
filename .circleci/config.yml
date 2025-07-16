@@ -108,9 +108,13 @@ jobs:
               git push origin $CIRCLE_BRANCH
             fi
             
+            # Create namespace if it doesn't exist
+            kubectl create namespace nebulance-app --dry-run=client -o yaml | kubectl apply -f -
+            
             # Deploy with Helm
             helm upgrade --install nebulance-app helm-charts/ \
               --namespace nebulance-app \
+              --set secrets.enabled=true \
               --timeout 10m
 
 workflows:
