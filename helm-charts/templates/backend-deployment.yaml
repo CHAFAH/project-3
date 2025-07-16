@@ -66,6 +66,8 @@ spec:
               key: POSTGRES_DB
         - name: POSTGRES_HOST
           value: {{ .Values.database.name | quote }}
+        - name: POSTGRES_PORT
+          value: {{ .Values.database.service.port | quote }}
         livenessProbe:
           httpGet:
             path: /health
