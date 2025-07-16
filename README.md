@@ -174,28 +174,17 @@ aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
   --policy-document file://iam_policy.json
 
-# If policy already exists, update it with missing permissions
-aws iam put-role-policy \
-  --role-name AmazonEKSLoadBalancerController \
-  --policy-name AdditionalELBPermissions \
-  --policy-document '{
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Action": [
-          "elasticloadbalancing:DescribeListenerAttributes",
-          "elasticloadbalancing:ModifyListenerAttributes"
-        ],
-        "Resource": "*"
-      }
-    ]
-  }'
+# Associate OIDC provider with cluster
+eksctl utils associate-iam-oidc-provider \
+  --region eu-central-1 \
+  --cluster eks-nebulance \
+  --approve
 
-# Create IAM role and service account
+# Create IAM service account
 # Replace ACCOUNT_ID with your actual AWS account ID (531807594086)
 REGION="eu-central-1"
 CLUSTER="eks-nebulance"
+ACCOUNT_ID="531807594086"
 
 eksctl create iamserviceaccount \
   --region $REGION \
@@ -205,10 +194,6 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerController \
   --attach-policy-arn arn:aws:iam::$ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
-
-# Alternative: If eksctl fails, the IAM role is already created by Terraform
-# Check if it exists:
-kubectl get serviceaccount aws-load-balancer-controller -n kube-system
 
 # Add EKS Helm repository
 helm repo add eks https://aws.github.io/eks-charts
@@ -234,10 +219,10 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
 
-# Uninstall existing installation if needed
-helm uninstall external-secrets -n external-secrets
+# Install External Secrets CRDs first
+kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/main/deploy/crds/bundle.yaml
 
-# Install External Secrets Operator with CRDs
+# Install External Secrets Operator
 helm install external-secrets external-secrets/external-secrets \
   -n external-secrets \
   --create-namespace \
