@@ -53,40 +53,57 @@ jobs:
           command: |
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
             
-            # Create timestamp
-            TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+            # Create image tag with branch, date and git SHA
+            BRANCH=$(echo $CIRCLE_BRANCH | sed 's/[^a-zA-Z0-9]/-/g')
+            DATE=$(date +"%Y%m%d")
+            SHA=$(echo $CIRCLE_SHA1 | cut -c1-7)
+            IMAGE_TAG="${BRANCH}-${DATE}-${SHA}"
             
             # Build and push backend image
             cd application/backend
-            docker build -t $DOCKER_USERNAME/nebulance-app:backend-$TIMESTAMP .
-            docker push $DOCKER_USERNAME/nebulance-app:backend-$TIMESTAMP
+            docker build -t $DOCKER_USERNAME/nebulance-app:backend-$IMAGE_TAG .
+            docker push $DOCKER_USERNAME/nebulance-app:backend-$IMAGE_TAG
             
             # Build and push frontend image
             cd ../frontend
-            docker build -t $DOCKER_USERNAME/nebulance-app:frontend-$TIMESTAMP .
-            docker push $DOCKER_USERNAME/nebulance-app:frontend-$TIMESTAMP
+            docker build -t $DOCKER_USERNAME/nebulance-app:frontend-$IMAGE_TAG .
+            docker push $DOCKER_USERNAME/nebulance-app:frontend-$IMAGE_TAG
             
-            # Save timestamp for deployment
-            echo "export TIMESTAMP=$TIMESTAMP" >> $BASH_ENV
+            # Save image tag for deployment
+            echo "export IMAGE_TAG=$IMAGE_TAG" >> $BASH_ENV
+            echo $IMAGE_TAG > /tmp/image_tag.txt
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - image_tag.txt
 
   deploy-to-eks:
     docker:
       - image: cimg/aws:2023.09
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp
       - run:
           name: Deploy to EKS
           command: |
-            # Configure kubectl
             aws eks update-kubeconfig --region eu-central-1 --name eks-nebulance
             
-            # Use same timestamp from build job
-            TIMESTAMP=$(date +"%Y%m%d-%H%M%S")
+            # Use image tag from build job
+            IMAGE_TAG=$(cat /tmp/image_tag.txt)
             
-            # Update Helm values with timestamped images
-            sed -i "s|repository: hilltopconsultancy/nebulance-app|repository: $DOCKER_USERNAME/nebulance-app|g" helm-charts/values.yaml
-            sed -i "s|tag: \"frontend-1.0.0\"|tag: \"frontend-$TIMESTAMP\"|g" helm-charts/values.yaml
-            sed -i "s|tag: \"backend-1.0.0\"|tag: \"backend-$TIMESTAMP\"|g" helm-charts/values.yaml
+            # Update Helm values with new images
+            sed -i "s|repository: hilltopconsultancy/neb-frontend|repository: $DOCKER_USERNAME/nebulance-app|g" helm-charts/values.yaml
+            sed -i "s|repository: hilltopconsultancy/neb-backend|repository: $DOCKER_USERNAME/nebulance-app|g" helm-charts/values.yaml
+            sed -i "s|tag: \"frontend-v1\"|tag: \"frontend-$IMAGE_TAG\"|g" helm-charts/values.yaml
+            sed -i "s|tag: \"backend-v1\"|tag: \"backend-$IMAGE_TAG\"|g" helm-charts/values.yaml
+            
+            # Commit updated values.yaml back to repo
+            git config user.email "circleci@example.com"
+            git config user.name "CircleCI"
+            git add helm-charts/values.yaml
+            git commit -m "Update image tags to $IMAGE_TAG [skip ci]"
+            git push origin $CIRCLE_BRANCH
             
             # Deploy with Helm
             helm upgrade --install nebulance-app helm-charts/ \

@@ -16,8 +16,8 @@ frontend:
   name: frontend
   replicas: 2
   image:
-    repository: hilltopconsultancy/neb-frontend:frontend-v1
-    tag: "frontend-1.0.0"
+    repository: hilltopconsultancy/neb-frontend
+    tag: "frontend-v1"
     pullPolicy: IfNotPresent
   
   service:
@@ -44,8 +44,8 @@ backend:
   name: backend
   replicas: 3
   image:
-    repository: hilltopconsultancy/neb-backend:backend-v1
-    tag: "backend-1.0.0"
+    repository: hilltopconsultancy/neb-backend
+    tag: "backend-v1"
     pullPolicy: IfNotPresent
   
   service:
