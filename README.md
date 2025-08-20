@@ -220,8 +220,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 📚 [Documentation](https://github.com/nebula-engineering/nebulance/wiki)
 - 🐛 [Issue Tracker](https://github.com/nebula-engineering/nebulance/issues)
-- 💬 [Discussions](https://github.com/nebula-engineering/nebulance/discussions)
-- 📧 [Email Support](mailto:support@nebula-engineering.com)
+- 💬 [Services]([https://www.nebulancesystems.com/](https://www.nebulancesystems.com/services))
+- 📧 [Email Support](mailto:support@nebulancesystems.com)
 
 ## 🌟 Showcase
 
@@ -233,7 +233,7 @@ Nebulance has been successfully deployed in production environments serving:
 
 ---
 
-**Built with ❤️ by [Prince Chafah] | Senior DevOps Engineer & Cloud Architect**
+**Built with ❤️ by Prince Chafah | Senior DevOps Engineer & Cloud Architect**
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/yourprofile/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black)](https://github.com/yourusername/)
