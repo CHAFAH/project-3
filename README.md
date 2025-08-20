@@ -194,36 +194,36 @@ export FRONTEND_URL=$(kubectl get svc frontend -o jsonpath='{.status.loadBalance
 open "http://$FRONTEND_URL"
 ```
 
-## 📈 Performance Metrics
+## Performance Metrics
 
 - **Application Response Time**: < 200ms p95
 - **Deployment Time**: Full stack in under 20 minutes
 - **Scaling Response**: Pod scaling within 60 seconds
 - **Availability**: 99.95% SLA target
 
-## 🏆 Enterprise Features
+##  Enterprise Features
 
 - **Multi-Region Deployment**: Ready for global deployment patterns
 - **Disaster Recovery**: Automated backup and recovery procedures
 - **Cost Optimization**: Spot instance integration and resource right-sizing
 - **Compliance Ready**: GDPR, HIPAA, and SOC2 compliant configurations
 
-## 🤝 Contributing
+##  Contributing
 
 Nebulance welcomes contributions from the community. Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting pull requests.
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Support
 
-- 📚 [Documentation](https://github.com/nebula-engineering/nebulance/wiki)
-- 🐛 [Issue Tracker](https://github.com/nebula-engineering/nebulance/issues)
-- 💬 [Services]([https://www.nebulancesystems.com/](https://www.nebulancesystems.com/services))
+- 📚 [Contact](https://www.nebulancesystems.com/contact)
+- 🐛 [Blog](https://www.nebulancesystems.com/blog)
+- 💬 [Services](https://www.nebulancesystems.com/services)
 - 📧 [Email Support](mailto:support@nebulancesystems.com)
 
-## 🌟 Showcase
+##  Showcase
 
 Nebulance has been successfully deployed in production environments serving:
 - E-commerce platforms with 10,000+ daily users
