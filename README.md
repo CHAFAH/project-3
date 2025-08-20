@@ -1,72 +1,100 @@
-Nebulance: EKS Cluster Deployment
-Nebulance is a production-ready deployment of a 3-tier web application on Amazon EKS, showcasing enterprise-grade DevOps practices. It leverages Terraform for infrastructure provisioning, Helm for Kubernetes orchestration, and AWS Secrets Manager for secure credential management. The project demonstrates a modern CI/CD pipeline, containerized workloads, and monitoring-ready infrastructure, making it an excellent showcase for DevOps engineers.
-Features
+Nebulance
+OverviewNebulance is a production-ready 3-tier web application deployed on Amazon EKS using Terraform and Helm. It integrates AWS Secrets Manager for secure credential management, demonstrating enterprise-grade Kubernetes orchestration and Infrastructure as Code (IaC) practices. This project showcases a modern DevOps pipeline with containerized workloads, scalable architecture, and robust security.
+Application Architecture  
+Frontend Tier (React.js)  
 
-Automated Infrastructure: Provisions an EKS cluster with Terraform, including VPC, subnets, and auto-scaling node groups.
-Containerized Application: Deploys a React.js frontend, Node.js/Express backend, and PostgreSQL database using Docker and Kubernetes.
-Secure Secrets Management: Integrates AWS Secrets Manager for secure storage and retrieval of database and application credentials.
-CI/CD Pipeline: Includes a CircleCI configuration for automated testing and Docker image building.
-Scalable Architecture: Uses Horizontal Pod Autoscalers for frontend (2-5 replicas) and backend (3-10 replicas).
-Networking: Configures AWS Load Balancer Controller and External Secrets Operator for robust connectivity and secrets synchronization.
+Technology: React 18.x with modern hooks and routing  
+Features:  
+User authentication with JWT tokens  
+Real-time dashboard with statistics  
+User registration and login flows  
+Post creation and management  
+Responsive design with professional UI
 
-Tech Stack
 
-Languages: JavaScript (React, Node.js), Python (scripts), Bash
-Infrastructure: Terraform, AWS (EKS, VPC, Secrets Manager)
-Containerization: Docker, Kubernetes, Helm
-CI/CD: CircleCI, GitHub Actions (optional)
-Database: PostgreSQL 15
-Security: AWS Secrets Manager, JWT authentication, Helmet, CORS
+Container: Multi-stage Docker build with Nginx proxy  
+Networking: ClusterIP service with ingress routing  
+Scaling: Horizontal Pod Autoscaler (2-5 replicas)
 
-Architecture
-The application follows a 3-tier architecture:
+Backend Tier (Node.js/Express)  
 
-Frontend: React.js with JWT-based authentication, real-time dashboard, and responsive UI.
-Backend: Node.js/Express RESTful API with endpoints for user management, posts, and health checks.
-Database: PostgreSQL with persistent storage and credentials managed via AWS Secrets Manager.
+Technology: Node.js with Express.js framework  
+Features:  
+RESTful API with comprehensive endpoints  
+JWT authentication with bcrypt password hashing  
+PostgreSQL integration with connection pooling  
+Rate limiting and security middleware (Helmet, CORS)  
+Health checks and graceful shutdown  
+Comprehensive error handling
 
-graph TD
-    A[User] -->|HTTP| B[AWS Load Balancer]
-    B --> C[Frontend: React.js]
-    C -->|ClusterIP| D[Backend: Node.js/Express]
-    D -->|JDBC| E[PostgreSQL]
-    D -->|Secrets| F[AWS Secrets Manager]
-    E -->|Secrets| F
-    G[Terraform] --> H[EKS Cluster]
-    H --> C
-    H --> D
-    H --> E
-    I[CircleCI] -->|Build & Push| J[Docker Registry]
-    J --> H
 
-Prerequisites
-Required Tools
-Install the following tools:
-# AWS CLI
+Endpoints:  
+POST /api/register - User registration  
+POST /api/login - User authentication  
+GET /api/users - List users (protected)  
+POST /api/posts - Create posts (protected)  
+GET /api/posts - List all posts  
+GET /api/dashboard - Dashboard statistics  
+GET /health - Health check endpoint  
+GET /version - Application version info
+
+
+Scaling: Horizontal Pod Autoscaler (3-10 replicas)
+
+Database Tier (PostgreSQL)  
+
+Technology: PostgreSQL 15 with persistent storage  
+Schema: Users and posts tables with relationships  
+Security: Credentials managed via AWS Secrets Manager  
+Storage: Persistent Volume Claims with EBS volumes  
+High Availability: Single instance with persistent storage
+
+Infrastructure Components  
+Amazon EKS Cluster  
+
+Cluster Name: eks-nebulance  
+Region: eu-central-1 (Frankfurt)  
+Kubernetes Version: 1.28+  
+Node Groups: Auto-scaling t3.medium instances (2-10 nodes)  
+Networking: IPv4 with private endpoint access  
+Add-ons: CoreDNS, kube-proxy, VPC CNI, AWS Load Balancer Controller
+
+VPC and Networking  
+
+CIDR Block: 10.0.0.0/16  
+Public Subnets: 3 subnets for load balancers across AZs  
+Private Subnets: 3 subnets for worker nodes across AZs  
+Internet Gateway: Public subnet internet access  
+NAT Gateways: Private subnet outbound connectivity  
+Security Groups: Minimal required access patterns
+
+Prerequisites  
+Required Tools  
+# Install AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && sudo ./aws/install
 
-# kubectl
+# Install kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
-# Helm
+# Install Helm
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-# Terraform
+# Install Terraform
 wget https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip
 unzip terraform_1.6.0_linux_amd64.zip && sudo mv terraform /usr/local/bin/
 
-AWS Configuration
-# Configure AWS CLI
+AWS Configuration  
+# Configure AWS CLI with your credentials
 aws configure
 # Enter: Access Key ID, Secret Access Key, Region (eu-central-1), Output format (json)
 
 # Verify AWS access
 aws sts get-caller-identity
 
-Getting Started
-Step 1: Build and Push Docker Images
+Deployment Steps  
+Step 1: Build and Push Docker ImagesBuild Application Images  
 # Build backend image
 cd application/backend/
 docker build -t your-registry/nebulance-app:backend-1.0.0 .
@@ -77,15 +105,15 @@ cd ../frontend/
 docker build -t your-registry/nebulance-app:frontend-1.0.0 .
 docker push your-registry/nebulance-app:frontend-1.0.0
 
-Step 2: Deploy Infrastructure with Terraform
+Step 2: Deploy Infrastructure with Terraform  
 cd ../../terraform/
 terraform init
 terraform plan
 terraform apply
 aws eks update-kubeconfig --region eu-central-1 --name eks-nebulance
 
-Step 3: Create AWS Secrets
-# Generate secure secrets
+Step 3: Create AWS SecretsGenerate secure secrets and store them in AWS Secrets Manager:  
+# Generate cryptographically secure secrets
 JWT_SECRET=$(openssl rand -base64 32)
 API_KEY=$(openssl rand -hex 16)
 DB_PASSWORD=$(openssl rand -base64 20)
@@ -104,8 +132,11 @@ aws secretsmanager create-secret \
   --secret-string "{\"JWT_SECRET\":\"$JWT_SECRET\",\"API_KEY\":\"$API_KEY\",\"NODE_ENV\":\"production\"}" \
   --region eu-central-1
 
-Step 4: Install AWS Load Balancer Controller
-# Download IAM policy
+# Verify secrets were created
+aws secretsmanager list-secrets --region eu-central-1
+
+Step 4: Install AWS Load Balancer Controller  
+# Download IAM policy for AWS Load Balancer Controller
 curl -o iam_policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
 
 # Create IAM policy
@@ -113,14 +144,14 @@ aws iam create-policy \
   --policy-name AWSLoadBalancerControllerIAMPolicy \
   --policy-document file://iam_policy.json
 
-# Associate OIDC provider
+# Associate OIDC provider with cluster
 eksctl utils associate-iam-oidc-provider \
   --region eu-central-1 \
   --cluster eks-nebulance \
   --approve
 
 # Create IAM service account
-ACCOUNT_ID="531807594086"  # Replace with your AWS account ID
+ACCOUNT_ID="531807594086" # Replace with your AWS account ID
 eksctl create iamserviceaccount \
   --region eu-central-1 \
   --cluster eks-nebulance \
@@ -130,9 +161,11 @@ eksctl create iamserviceaccount \
   --attach-policy-arn arn:aws:iam::$ACCOUNT_ID:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
 
-# Install AWS Load Balancer Controller
+# Add EKS Helm repository
 helm repo add eks https://aws.github.io/eks-charts
 helm repo update
+
+# Install AWS Load Balancer Controller
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --namespace kube-system \
   --set clusterName=eks-nebulance \
@@ -141,17 +174,32 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set region=eu-central-1 \
   --set vpcId=vpc-04e571ce92ba6626d  # Replace with your VPC ID
 
-Step 5: Install External Secrets Operator
+# Verify installation
+kubectl get deployment -n kube-system aws-load-balancer-controller
+
+Step 5: Install External Secrets Operator  
+# Add External Secrets Operator Helm repository
 helm repo add external-secrets https://charts.external-secrets.io
 helm repo update
+
+# Install External Secrets CRDs first
 kubectl apply -f https://raw.githubusercontent.com/external-secrets/external-secrets/main/deploy/crds/bundle.yaml
+
+# Install External Secrets Operator
 helm install external-secrets external-secrets/external-secrets \
   -n external-secrets \
   --create-namespace \
   --set installCRDs=true
 
-Step 6: Update Helm Chart Configuration
-Edit helm-charts/values.yaml:
+# Verify installation
+kubectl get pods -n external-secrets
+kubectl get crd | grep external-secrets
+
+Step 6: Update Helm Chart ConfigurationBefore deploying, update the Helm chart values:  
+cd ../helm-charts/
+vim values.yaml
+
+Update these sections in values.yaml:  
 frontend:
   image:
     repository: your-registry/nebulance-app
@@ -166,40 +214,158 @@ backend:
   service:
     type: ClusterIP
 
-Step 7: Deploy Application with Helm
-cd ../helm-charts/
-helm template nebulance-app . --validate
-helm install nebulance-app . \
+Step 7: Setup CI/CD Pipeline (Optional)Configure CircleCI pipeline for automated image building:  
+# Set up CircleCI environment variables in your project settings:
+# - DOCKER_LOGIN: Your Docker Hub username
+# - DOCKER_PASSWORD: Your Docker Hub password
+
+The included .circleci/config.yml provides:  
+
+Automated testing for both frontend and backend  
+Docker image building and pushing  
+Automatic updating of Helm values.yaml with new image tags
+
+Note: CircleCI only builds and pushes images. Manual deployment via Helm is required:  
+helm upgrade --install nebulance-app helm-charts/ \
+  --namespace production \
+  --create-namespace
+
+Step 8: Deploy Application with Helm  
+# Template and validate Helm charts
+helm template nebulance-app helm-charts/ --validate
+
+# Install the application stack
+helm install nebulance-app helm-charts/ \
   --namespace nebulance-app \
   --create-namespace \
   --timeout 10m
 
-Step 8: Verify Deployment
+# Verify deployment
 kubectl get pods -n nebulance-app
+kubectl get secrets -n nebulance-app
 kubectl get services -n nebulance-app
-FRONTEND_URL=$(kubectl get service frontend -n nebulance-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-echo "Open browser to: http://$FRONTEND_URL"
 
-Testing
-# Test backend health endpoint via port-forward
+# Check External Secrets sync
+kubectl get externalsecrets -n nebulance-app
+kubectl describe externalsecret database-secrets -n nebulance-app
+
+Verification and Testing  
+Check Application Status  
+# Verify all pods are running
+kubectl get pods -n nebulance-app
+
+# Check services and LoadBalancer URLs
+kubectl get services -n nebulance-app
+
+# Get LoadBalancer external URLs
+kubectl get services -n nebulance-app -o wide
+
+# View application logs
+kubectl logs -f deployment/backend -n nebulance-app
+kubectl logs -f deployment/frontend -n nebulance-app
+
+Test Application Functionality  
+# Get the frontend LoadBalancer URL
+FRONTEND_URL=$(kubectl get service frontend -n nebulance-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+echo "Frontend URL: http://$FRONTEND_URL"
+
+# Backend is ClusterIP (internal only) - test via port-forward
 kubectl port-forward service/backend 3000:3000 -n nebulance-app &
+
+# Test health endpoint (via port-forward)
 curl http://localhost:3000/health
 
-# Run frontend tests
-cd application/frontend/
-npm test
+# Test version endpoint (via port-forward)
+curl http://localhost:3000/version
 
-# Run backend tests
-cd ../backend/
-npm test
+# Access frontend application
+echo "Open browser to: http://$FRONTEND_URL"
 
-Troubleshooting
+File Structure  
+nebulance/
+├── README.md
+├── requirements.md
+├── application/
+│   ├── frontend/
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── Login.js
+│   │   │   │   ├── Register.js
+│   │   │   │   └── Dashboard.js
+│   │   │   ├── App.js
+│   │   │   ├── App.css
+│   │   │   └── index.js
+│   │   ├── public/
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │   └── nginx.conf
+│   └── backend/
+│       ├── server.js
+│       ├── package.json
+│       └── Dockerfile
+├── terraform/
+│   ├── main.tf
+│   ├── eks.tf
+│   ├── vpc.tf
+│   ├── variables.tf
+│   └── outputs.tf
+├── .circleci/
+│   └── config.yml
+└── helm-charts/
+    ├── Chart.yaml
+    ├── values.yaml
+    └── templates/
 
-EKS Cluster Issues: Verify IAM permissions (aws iam get-user) and VPC limits (aws ec2 describe-account-attributes).
-Pod Failures: Check logs (kubectl logs <pod-name> -n nebulance-app) and secrets sync (kubectl describe externalsecret database-secrets -n nebulance-app).
-Load Balancer Issues: Ensure security groups allow traffic (aws ec2 describe-security-groups).
+Troubleshooting  
+Common Issues  
+EKS Cluster Creation Fails  
+# Check IAM permissions
+aws iam get-user
+aws iam list-attached-user-policies --user-name your-username
 
-Contributing
-Contributions are welcome! Please fork the repository, create a feature branch, and submit a pull request following the PULL_REQUEST_TEMPLATE.
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
+# Check VPC limits
+aws ec2 describe-account-attributes --attribute-names supported-platforms
+
+Pods Fail to Start  
+# Check pod status and logs
+kubectl describe pod <pod-name> -n production
+kubectl logs <pod-name> -n production
+
+# Check secrets synchronization
+kubectl get externalsecrets -n production
+kubectl describe externalsecret database-secret -n production
+
+External Secrets Not Syncing  
+# Check External Secrets Operator logs
+kubectl logs -f deployment/external-secrets -n external-secrets-system
+
+# Verify IRSA configuration
+kubectl describe serviceaccount external-secrets-sa -n production
+
+Application Not Accessible  
+# Check LoadBalancer services status
+kubectl get services -n production
+kubectl describe service frontend -n production
+kubectl describe service backend -n production
+
+# Check if security groups allow external traffic
+aws ec2 describe-security-groups --filters "Name=group-name,Values=*eks*"
+
+Success Criteria  
+Infrastructure ✅  
+
+EKS cluster operational and accessible via kubectl  
+External Secrets Operator pulling secrets from AWS Secrets Manager  
+Proper IAM roles and IRSA configuration  
+Security groups configured for LoadBalancer access
+
+Application ✅  
+
+All three tiers (frontend, backend, database) deployed and running  
+External access via Network Load Balancers (frontend on port 80, backend on port 3000)  
+User registration and authentication working  
+Database persistence across pod restarts  
+Secrets properly injected from AWS Secrets Manager
+
+ContributingContributions are welcome! Please fork the repository, create a feature branch, and submit a pull request following the PULL_REQUEST_TEMPLATE.
+LicenseThis project is licensed under the MIT License - see the LICENSE file for details.
