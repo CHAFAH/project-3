@@ -235,7 +235,7 @@ Nebulance has been successfully deployed in production environments serving:
 
 **Built with ❤️ by Prince Chafah | Senior DevOps Engineer & Cloud Architect**
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/yourprofile/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://www.linkedin.com/in/sani-chafah/)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black)](https://github.com/yourusername/)
 [![Portfolio](https://img.shields.io/badge/Portfolio-Visit-green)](https://yourportfolio.com/)
 
