@@ -1,4 +1,4 @@
-# Nebulance: Enterprise-Grade EKS Deployment Platform
+Enterprise-Grade EKS Deployment Platform
 
 ![AWS](https://img.shields.io/badge/AWS-EC2%2C%20EKS%2C%20S3%2C%20RDS-orange)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-1.28+-blue)
